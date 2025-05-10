@@ -56,7 +56,7 @@ export default function Home() {
     setDescription(e.target.value);
   }
   function handleChecked(e) {
-    setIsChecked(e.target.value);
+    setIsChecked(!isChecked);
   }
 
   function handleEditShow(x) {
@@ -133,7 +133,7 @@ export default function Home() {
                   type={"checkbox"}
                   id={"default-checkbox"}
                   label={"checked"}
-                  value={isChecked}
+                  checked={isChecked}
                   onChange={handleChecked}
                 />
               </InputGroup>
