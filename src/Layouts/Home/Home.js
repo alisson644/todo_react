@@ -19,18 +19,33 @@ export default function Home() {
   const resetForm = () => {
     setTitle("");
     setDescription("");
+    setId(null);
+    setIsEdit(false);
   };
 
   const handleShow = () => setShow(true);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [id, setId] = useState(null);
+  const [isEdit, setIsEdit] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   const saveTask = () => {
-    if (title && description){
-        todoList.push({ id: todoList.length, title, description, checked: false });
-        handleClose();
-    } 
+    if (title && description && !isEdit) {
+      todoList.push({
+        id: todoList.length,
+        title,
+        description,
+        checked: false,
+      });
+      handleClose();
+    } else {
+      todoList[id]["title"] = title;
+      todoList[id]["description"] = description;
+      todoList[id]["checked"] = isChecked;
+      handleClose();
+    }
   };
 
   function handleChangeTitle(e) {
@@ -39,6 +54,18 @@ export default function Home() {
 
   function handleChangeDescription(e) {
     setDescription(e.target.value);
+  }
+  function handleChecked(e) {
+    setIsChecked(e.target.value);
+  }
+
+  function handleEditShow(x) {
+    setDescription(x.description);
+    setTitle(x.title);
+    setId(x.id);
+    setIsChecked(x.checked);
+    setIsEdit(true);
+    handleShow();
   }
 
   return (
@@ -61,8 +88,17 @@ export default function Home() {
               <tr key={x.id}>
                 <td> {x.title} </td>
                 <td> {x.description}</td>
-                <td> {x.checked ? 'is checked' : 'not checked'}</td>
-                <td> edit e remove </td>
+                <td> {x.checked ? "is checked" : "not checked"}</td>
+                <td>
+                  {" "}
+                  <Button
+                    variant="primary"
+                    className="mr-auto"
+                    onClick={() => handleEditShow(x)}
+                  >
+                    Edit Task
+                  </Button>{" "}
+                </td>
               </tr>
             );
           })}
@@ -70,7 +106,7 @@ export default function Home() {
       </Table>
       <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Create Task</Modal.Title>
+          <Modal.Title>{isEdit ? "Edit Task" : "Create Task"}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
@@ -91,6 +127,17 @@ export default function Home() {
                 aria-label="Description"
               />
             </InputGroup>
+            {isEdit && (
+              <InputGroup>
+                <Form.Check
+                  type={"checkbox"}
+                  id={"default-checkbox"}
+                  label={"checked"}
+                  value={isChecked}
+                  onChange={handleChecked}
+                />
+              </InputGroup>
+            )}
           </Form>
         </Modal.Body>
         <Modal.Footer>
@@ -98,7 +145,7 @@ export default function Home() {
             Close
           </Button>
           <Button variant="primary" onClick={saveTask}>
-            Create Task
+            {isEdit ? "Edit Task" : "Create Task"}
           </Button>
         </Modal.Footer>
       </Modal>
