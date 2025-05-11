@@ -8,8 +8,9 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 
 export default function Home() {
-  const todoList = useContext(TodoListContext);
+  const [todoList, setTodoList] = useState(useContext(TodoListContext));
   const [show, setShow] = useState(false);
+  const [lengthId, setLengthId] = useState(0);
 
   const handleClose = () => {
     setShow(false);
@@ -31,35 +32,50 @@ export default function Home() {
   const [isEdit, setIsEdit] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
 
+  const setPrimaryKey = () => {
+    var x = lengthId + 1;
+    setLengthId(x);
+    return lengthId;
+  };
+
   const saveTask = () => {
     if (title && description && !isEdit) {
       todoList.push({
-        id: todoList.length,
+        id: setPrimaryKey(),
         title,
         description,
         checked: false,
       });
       handleClose();
     } else {
-      todoList[id]["title"] = title;
-      todoList[id]["description"] = description;
-      todoList[id]["checked"] = isChecked;
+      todoList.map((task) => {
+        if (task.id === id) {
+          task.title = title;
+          task.description = description;
+          task.checked = isChecked;
+        }
+      });
       handleClose();
     }
   };
 
-  function handleChangeTitle(e) {
+  const handleChangeTitle = (e) => {
     setTitle(e.target.value);
   }
 
-  function handleChangeDescription(e) {
+  const handleChangeDescription = (e) => {
     setDescription(e.target.value);
   }
-  function handleChecked(e) {
+  const  handleChecked = (e) => {
     setIsChecked(!isChecked);
   }
 
-  function handleEditShow(x) {
+  const deleteTask = (task) => {
+    let arr = todoList.filter((item) => item.id !== task.id);
+    setTodoList(arr);
+  }
+
+  const  handleEditShow = (x) => {
     setDescription(x.description);
     setTitle(x.title);
     setId(x.id);
@@ -88,15 +104,22 @@ export default function Home() {
               <tr key={x.id}>
                 <td> {x.title} </td>
                 <td> {x.description}</td>
-                <td> {x.checked ? "is checked" : "not checked"}</td>
+                <td> {x.checked ? "Done" : "Not done"}</td>
                 <td>
                   {" "}
                   <Button
-                    variant="primary"
+                    variant="warning"
                     className="mr-auto"
                     onClick={() => handleEditShow(x)}
                   >
                     Edit Task
+                  </Button>{" "}
+                  <Button
+                    variant="danger"
+                    className="mr-auto"
+                    onClick={() => deleteTask(x)}
+                  >
+                    Delete Task
                   </Button>{" "}
                 </td>
               </tr>
@@ -132,7 +155,7 @@ export default function Home() {
                 <Form.Check
                   type={"checkbox"}
                   id={"default-checkbox"}
-                  label={"checked"}
+                  label={"Done"}
                   checked={isChecked}
                   onChange={handleChecked}
                 />
