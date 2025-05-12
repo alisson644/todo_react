@@ -6,11 +6,13 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
+import Alert from "react-bootstrap/Alert";
 
 export default function Home() {
   const [todoList, setTodoList] = useState(useContext(TodoListContext));
   const [show, setShow] = useState(false);
   const [lengthId, setLengthId] = useState(0);
+  const [alertClose, setAlertClose] = useState(false);
 
   const handleClose = () => {
     setShow(false);
@@ -54,6 +56,7 @@ export default function Home() {
           task.description = description;
           task.checked = isChecked;
         }
+        return 0;
       });
       handleClose();
     }
@@ -61,28 +64,39 @@ export default function Home() {
 
   const handleChangeTitle = (e) => {
     setTitle(e.target.value);
-  }
+  };
 
   const handleChangeDescription = (e) => {
     setDescription(e.target.value);
-  }
-  const  handleChecked = (e) => {
+  };
+  const handleChecked = (e) => {
     setIsChecked(!isChecked);
-  }
+  };
 
   const deleteTask = (task) => {
     let arr = todoList.filter((item) => item.id !== task.id);
     setTodoList(arr);
-  }
+  };
 
-  const  handleEditShow = (x) => {
+  const handleEditShow = (x) => {
     setDescription(x.description);
     setTitle(x.title);
     setId(x.id);
     setIsChecked(x.checked);
     setIsEdit(true);
     handleShow();
-  }
+  };
+  const doneTask = (x) => {
+    todoList.map((task) => {
+      if (task.id === x.id) {
+        task.checked = !task.checked;
+      }
+    });
+    setAlertClose(true);
+    setTimeout(() => {
+      setAlertClose(false);
+    }, 1000);
+  };
 
   return (
     <Container>
@@ -113,6 +127,13 @@ export default function Home() {
                     onClick={() => handleEditShow(x)}
                   >
                     Edit Task
+                  </Button>{" "}
+                  <Button
+                    variant="info"
+                    className="mr-auto"
+                    onClick={() => doneTask(x)}
+                  >
+                    {x.checked ? "Not Done Task" : " Done Task"}
                   </Button>{" "}
                   <Button
                     variant="danger"
@@ -172,6 +193,15 @@ export default function Home() {
           </Button>
         </Modal.Footer>
       </Modal>
+      <Alert
+        show={alertClose}
+        key={"info"}
+        variant={"info"}
+        onClose={() => setAlertClose(false)}
+        dismissible
+      >
+        This task is Alter
+      </Alert>
     </Container>
   );
 }
